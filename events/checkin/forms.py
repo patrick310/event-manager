@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 class CheckInForm(forms.Form):
     badge_number = forms.CharField(label='badge_number', max_length=5,
-                                   help_text="Enter a 5 digit badge number",
+                                  # help_text="Enter a 5 digit badge number",
                                    required=True,
                                    initial='',
                                    widget=forms.TextInput(attrs={'autofocus': 'autofocus'}))
