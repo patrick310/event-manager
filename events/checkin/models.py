@@ -7,7 +7,7 @@ class Guest(models.Model):
     is_checked_in = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.name + " is checked in : " + self.is_checked_in_str()
+        return self.badge_number
 
     def is_checked_in_str(self):
         if self.is_checked_in:
