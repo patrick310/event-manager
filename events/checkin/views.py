@@ -1,17 +1,15 @@
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
-from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist
-from .forms import CheckInForm
-
 from random import randint
 
-from PIL import Image, ImageDraw
-
 import barcode
+from PIL import Image
 from barcode.writer import ImageWriter
+from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render
 
-
+from .barcode import create_composite_barcode_image
+from .forms import CheckInForm
 from .models import Guest
 
 
@@ -63,16 +61,21 @@ def checkin(request):
 def bartest(request):
 
     badge_numbers = [e.badge_number for e in Guest.objects.all()]
-    selection = badge_numbers[randint(0,len(badge_numbers)-1)]
 
-    code128 = barcode.get_barcode_class('code128')
-    code = code128(selection, writer=ImageWriter())
+    num_selection = 2
+    for i in range(num_selection):
+        selection = badge_numbers[randint(0, len(badge_numbers) - 1)]
 
-    barcode_image = code.save('checkin/static/checkin/tmp/ean8_barcode')
+        code128 = barcode.get_barcode_class('code128')
+        code = code128(selection, writer=ImageWriter())
+
+        barcode_image = code.save('checkin/static/checkin/tmp/ean8_barcode' + str(i))
+
+    create_composite_barcode_image()
 
     response = HttpResponse(content_type="image/png")
 
-    image = Image.open(barcode_image)
+    image = Image.open('checkin/static/checkin/tmp/master.png')
     image.save(response, 'PNG')
 
     return response
