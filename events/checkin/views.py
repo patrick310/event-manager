@@ -29,11 +29,11 @@ def checkin(request):
                 guest.is_checked_in = True
                 guest.save()
 
-                status = "The guest is successfully checked in"
+                status = guest.name + " is successfully checked in"
                 messages.success(request, status)
 
             else:
-                status = "The guest is already checked in!"
+                status = guest_instance.name + " is already checked in!"
                 messages.error(request, status)
 
             return HttpResponseRedirect(request.path)
