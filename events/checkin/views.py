@@ -58,11 +58,10 @@ def checkin(request):
     return render(request, 'checkin/index.html', context)
 
 
-def bartest(request):
+def bartest(request, num_selection=5):
 
     badge_numbers = [e.badge_number for e in Guest.objects.all()]
 
-    num_selection = 2
     for i in range(num_selection):
         selection = badge_numbers[randint(0, len(badge_numbers) - 1)]
 
