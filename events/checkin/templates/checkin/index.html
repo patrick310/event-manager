@@ -89,7 +89,17 @@ img {
 <ul class="messages">
   {% for message in messages %}
   <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-  {% endfor %}
+    {% with "checkin/audio/"|add:message.tags|add:".wav" as wav_static %}
+    {% with "checkin/audio/"|add:message.tags|add:".mp3" as mpeg_static %}
+    <audio autoplay>
+        <source src="{% static wav_static %}" type="audio/wav">
+        <source src="{% static mpeg_static %}" type="audio/mpeg">
+        {% endwith %}
+        {% endwith %}
+        Your browser does not support the audio element.
+    </audio>
+
+    {% endfor %}
 </ul>
 {% endif %}
 
@@ -101,9 +111,3 @@ img {
 </form>
 
 <img src="{% static " checkin/images/star.jpeg" %}" alt="Air, land, and sea">
-
-<audio autoplay>
-    <source src="horse.ogg" type="audio/ogg">
-    <source src="horse.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
-</audio>
