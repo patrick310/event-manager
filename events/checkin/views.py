@@ -1,3 +1,4 @@
+import csv
 from random import randint
 
 import barcode
@@ -5,6 +6,7 @@ from PIL import Image
 from barcode.writer import ImageWriter
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Sum
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 
@@ -37,7 +39,7 @@ def checkin(request):
 
             if not guest_instance.is_checked_in:
                 guest = Guest.objects.get(pk=badge_number)
-                guest.is_checked_in = True
+                guest.check_in()
                 guest.save()
 
                 status = guest.name + " is successfully checked in"
@@ -76,5 +78,47 @@ def bartest(request, num_selection=5):
 
     image = Image.open('checkin/static/checkin/tmp/master.png')
     image.save(response, 'PNG')
+
+    return response
+
+
+def reset_db(response):
+    qs = Guest.objects.all()
+    qs.update(is_checked_in=False)
+    qs.update(number_check_ins=0)
+
+    response = HttpResponse("Wipe successful")
+
+    return response
+
+
+def summary(response):
+    total_guests = Guest.objects.all().count()
+    checked_in = Guest.objects.filter(is_checked_in=True).count()
+    Guest.objects.annotate(total_guests=Sum('number_check_ins'))
+
+    response = HttpResponse("Total number of guests: " + str(total_guests) + " Checked in: " + str(total_guests))
+
+    return response
+
+
+def get_model_fields(model):
+    return model._meta.fields
+
+
+def export(response):
+    response = HttpResponse(content_type='text/csv')
+    with open('export.csv', 'wb') as csvfile:
+        writer = csv.writer(csvfile)
+        row = get_model_fields(Guest)
+        writer.writerow(str(row))
+        for obj in Guest.objects.all():
+            row = ""
+            for field in get_model_fields(Guest):
+                row += str(getattr(obj, field.name)) + ","
+            writer.writerow(row)
+
+    response['Content-Disposition'] = 'attachment';
+    filename = "export.csv"
 
     return response

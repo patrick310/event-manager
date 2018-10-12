@@ -14,8 +14,9 @@ class CheckInForm(forms.Form):
         badge_number = self.cleaned_data['badge_number']
 
         badge_number = badge_number.strip("0")
+        badge_number = badge_number.upper()
 
-        if 5 < len(badge_number) > 5:
+        if 4 < len(badge_number) > 6:
             raise ValidationError(_('Invalid badge number length, must be 5 digits'))
 
         return badge_number
